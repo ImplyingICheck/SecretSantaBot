@@ -50,7 +50,7 @@ async def santa(ctx, *args):
                 break
 
         else:
-            await channel.send("Role does not exist")
+            await channel.send(f"{role_name} Role does not exist")
             return
 
         members = role_id.members
