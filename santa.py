@@ -28,19 +28,19 @@ async def on_voice_state_update(member, before, after):
     server = member.guild
     disconnects = 0
     if ((datetime.utcnow() - bot.lastFight)/timedelta(minutes = 1)) <= 5:
-        print("On cooldown")
+        #print("On cooldown")
         return
         
     else:
         entries = []
         async for entry in server.audit_logs(limit=3, action = discord.AuditLogAction.member_disconnect):
             if (datetime.utcnow() - entry.created_at)/timedelta(minutes = 1) != 1:
-                print("Adding an entry")
+                #print("Adding an entry")
                 entries.append(entry)
                 disconnects += entry.extra.count
 
         #Last disconnect fight was more than 3 minutes ago
-        if disconnects >= 31:
+        if disconnects >= 3:
             if before.channel != None:
                 channel = before.channel
             elif after.channel != None:
