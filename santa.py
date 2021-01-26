@@ -32,16 +32,15 @@ async def on_voice_state_update(member, before, after):
         return
         
     else:
-        print("Something updated")
         entries = []
         async for entry in server.audit_logs(limit=3, action = discord.AuditLogAction.member_disconnect):
-            if (datetime.utcnow() - entry.created_at)/timedelta(minutes = 1) < 1:
+            if (datetime.utcnow() - entry.created_at)/timedelta(minutes = 1) != 1:
                 print("Adding an entry")
                 entries.append(entry)
                 disconnects += entry.extra.count
 
         #Last disconnect fight was more than 3 minutes ago
-        if disconnects >= 3:
+        if disconnects >= 31:
             if before.channel != None:
                 channel = before.channel
             elif after.channel != None:
