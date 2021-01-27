@@ -90,20 +90,26 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if message.author.id == 193508802073460736 and message.content == '-skip' and bot.spite:
-        await message.author.move_to(None)
+    if message.author.bot:
+        return
+
+    spiting = message.author.id == 195939738069368832 and message.content == '-skip' and bot.spite
+    if spiting:
+        print("moving")
         await message.channel.send("Stop skipping tracks bitch")
+        await message.author.move_to(None)
+        
 
     await bot.process_commands(message)
 
 @bot.command(pass_context = True)
 async def spite(ctx):
-    if bot.spite and server.owner.name == ctx.author.name:
+    if bot.spite and ctx.guild.owner.name == ctx.author.name:
         bot.spite = False
-        ctx.author.send("Kempke is no longer being spited")
-    elif not bot.spite and server.owner.name == ctx.author.name:
+        await ctx.channel.send("Kempke is no longer being spited")
+    elif not bot.spite and ctx.guild.owner.name == ctx.author.name:
         bot.spite = True
-        ctx.author.send("Kempke is now being spited")
+        await ctx.channel.send("Kempke is now being spited")
 
 @bot.command(pass_context=True)  
 async def santa(ctx, *args):
