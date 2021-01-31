@@ -93,7 +93,7 @@ async def on_message(message):
     if message.author.bot:
         return
 
-    spiting = message.author.id == 195939738069368832 and message.content == '-skip' and bot.spite
+    spiting = message.author.id == 193508802073460736 and message.content == '-skip' and bot.spite
     if spiting:
         print("moving")
         await message.channel.send("Stop skipping tracks bitch")
