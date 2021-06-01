@@ -47,10 +47,15 @@ async def on_voice_state_update(member, before, after):
                 channel = after.channel
             bot.lastFight = datetime.utcnow()
             await wcwbf(channel)
-    
+
+def is_connected(ctx):
+    voice_client = discord.utils.get(ctx.bot.voice_clients, guild=ctx.guild)
+    return voice_client and voice_client.is_connected()
+
 async def wcwbf (channel):
     voice_channel = channel
     channel = None
+        
     if voice_channel != None:
         channel = voice_channel.name
         vc = await voice_channel.connect()
@@ -60,6 +65,25 @@ async def wcwbf (channel):
         while vc.is_playing():
             await sleep(1)
         await vc.disconnect()
+    
+async def wcwbfctx (ctx, channel):
+    voice_channel = channel
+    channel = None
+    if(is_connected(ctx)):
+        await ctx.channel.send("Bot is already connected")
+        return
+        
+    if voice_channel != None:
+        channel = voice_channel.name
+        vc = await voice_channel.connect()
+        song = discord.FFmpegOpusAudio(source="wcwbf.mp3")
+        print(song.is_opus())
+        vc.play(song)
+        while vc.is_playing():
+            await sleep(1)
+        await vc.disconnect()
+
+
 
 def checkDone(santas):
     count = 0
@@ -110,6 +134,15 @@ async def spite(ctx):
     elif not bot.spite and ctx.guild.owner.name == ctx.author.name:
         bot.spite = True
         await ctx.channel.send("Kempke is now being spited")
+
+@bot.command(pass_context = True)
+async def play(ctx):
+    server=ctx.guild
+    if(server.owner.name ==  ctx.author.name):
+        if(ctx.author.voice.channel == None):
+            await ctx.channel.send("Please join a voice channel")
+        else:
+            await wcwbfctx(ctx, ctx.author.voice.channel)
 
 @bot.command(pass_context=True)  
 async def santa(ctx, *args):
