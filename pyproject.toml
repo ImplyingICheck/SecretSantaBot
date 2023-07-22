@@ -1,9 +1,8 @@
 [tool.poetry]
-# TODO: Set a project name, description, and authors.
-name = "project_name"
+name = "secret_santa_bot"
 version = "0.1.0"
-description = ""
-authors = []
+description = "Bot designed to give out gift giving secrets."
+authors = ['agnorat1887', 'ImplyingICheck']
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -19,8 +18,32 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.4"
 pytest = "^7.3.1"
-yapf = "^0.33.0"
 pyright = "^1.1.314"
 pre-commit = "^3.3.3"
-pytest-cases = "^3.6.14"
 pytest-mock = "^3.11.1"
+pyink = "^23.5.0"
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
+pythonpath = "src cases"
+markers = [
+    "slow: marks slow-running tests",
+    "io: marks tests using external IO dependencies",
+]
+
+[tool.yapfignore]
+ignore_patterns = [
+    "dev_files/*.py",
+    "venv/*.py"
+]
+
+[tool.yapf]
+based_on_style = "yapf"
+
+[tool.pyright]
+include = ["src", "tests"]
+exclude = ["dev_files/*.py"]
+strict = ["src/"]
+reportMissingImports = true
+reportUntypedFunctionDecorator = true
+reportUntypedClassDecorator = true
