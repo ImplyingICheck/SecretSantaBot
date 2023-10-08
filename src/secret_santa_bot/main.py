@@ -39,7 +39,7 @@ def _get_secret_santa_bot_path():
     return secret_santa_bot_script
 
 if __name__ == '__main__':
-    vault = Vault(url='http://vault:8200',
+    vault = Vault(url='http://localhost:8200',
     token=os.environ['VAULT_TOKEN'])
     script_path = _get_secret_santa_bot_path()
     discord_authentication_token = vault.read_secret_token()
