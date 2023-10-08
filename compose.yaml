@@ -1,5 +1,27 @@
 services:
-  test:
+  bot:
     build:
       context: .
       dockerfile: dev/docker/Dockerfile
+    networks:
+      - santas_workshop
+  secrets:
+    image: hashicorp/vault
+    container_name: vault
+    volumes:
+      - ./secrets:/secrets
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: 'my_root'
+    cap_add:
+      - IPC_LOCK
+    command: ["server", "--dev"]
+    ports:
+      - "127.0.0.1:8200:8200"
+    networks:
+      - santas_workshop
+
+networks:
+  santas_workshop:
+
+volumes:
+  secrets:

@@ -8,6 +8,7 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.11"
 discord-py = "^2.3.2"
+hvac = "^1.2.1"
 
 [build-system]
 requires = ["poetry-core"]

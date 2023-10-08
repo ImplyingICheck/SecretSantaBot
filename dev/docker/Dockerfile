@@ -39,5 +39,5 @@ USER appuser
 COPY src .
 
 # Run the application.
-CMD python secret_santa_bot/santa.py 'TOKEN'
+CMD python secret_santa_bot/main.py
 
