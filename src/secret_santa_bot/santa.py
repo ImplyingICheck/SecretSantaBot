@@ -9,14 +9,14 @@ from asyncio import sleep
 
 intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix=">", intents=intents)
+bot = commands.Bot(command_prefix='>', intents=intents)
 intTime = datetime(2015, 2, 1, 15, 16, 17, 345)
 bot.lastFight = intTime
 bot.spite = True
 
 
 class Santa:
-    Name = ""
+    Name = ''
     give = -1
     receive = False
 
@@ -30,7 +30,6 @@ async def on_voice_state_update(member, before, after):
     if ((datetime.utcnow() - bot.lastFight) / timedelta(minutes=1)) <= 5:
         # print("On cooldown")
         return
-
     else:
         entries = []
         async for entry in server.audit_logs(
@@ -42,12 +41,11 @@ async def on_voice_state_update(member, before, after):
                 # print("Adding an entry")
                 entries.append(entry)
                 disconnects += entry.extra.count
-
         # Last disconnect fight was more than 3 minutes ago
         if disconnects >= 3:
-            if before.channel != None:
+            if before.channel is not None:
                 channel = before.channel
-            elif after.channel != None:
+            elif after.channel is not None:
                 channel = after.channel
             bot.lastFight = datetime.utcnow()
             await wcwbf(channel)
@@ -61,8 +59,7 @@ def is_connected(ctx):
 async def wcwbf(channel):
     voice_channel = channel
     channel = None
-
-    if voice_channel != None:
+    if voice_channel is not None:
         channel = voice_channel.name
         vc = await voice_channel.connect()
         song = discord.FFmpegOpusAudio(source="wcwbf.mp3")
@@ -79,8 +76,7 @@ async def wcwbfctx(ctx, channel):
     if is_connected(ctx):
         await ctx.channel.send("Bot is already connected")
         return
-
-    if voice_channel != None:
+    if voice_channel is not None:
         channel = voice_channel.name
         vc = await voice_channel.connect()
         song = discord.FFmpegOpusAudio(source="wcwbf.mp3")
@@ -126,7 +122,6 @@ async def on_ready():
 async def on_message(message):
     if message.author.bot:
         return
-
     spiting = (
         message.author.id == 193508802073460736
         and message.content == "-skip"
@@ -136,7 +131,6 @@ async def on_message(message):
         print("moving")
         await message.channel.send("Stop skipping tracks bitch")
         await message.author.move_to(None)
-
     await bot.process_commands(message)
 
 
@@ -171,21 +165,16 @@ async def santa(ctx, *args):
             if role_name.lower() == role.name.lower():
                 role_id = role
                 break
-
         else:
             await channel.send(f"{role_name} Role does not exist")
             return
-
         members = role_id.members
         names = []
-
         for member in members:
             names.append(member.name)
-
         santas = [Santa() for i in range(len(names))]
         for i in range(0, len(santas)):
             santas[i].Name = names[i]
-
         while not checkDone(santas):
             giver = random.randint(
                 0, len(santas) - 1
@@ -206,13 +195,7 @@ async def santa(ctx, *args):
             await members[x].send(
                 f"You will be giving a gift to {santas[i.give].Name}\nNote that this is their discord name and not the name that will be within the rules and information file\nThe rules and information for this year along with the addresses of everyone will be in the Secret Santa thread within the {server.name} server. The thread may close after a time but can still be viewed by clicking on the threads button -> Archived -> Private"
             )
-
-            # print("Giver: " + santas[giver].Name + " Receiver: " + santas[receiver].Name)
-
     else:
         await channel.send("Only the owner can roll for secret santa")
-    # await members[0].send("test")
-    # await channel.send(f"Users in {role_id}, {santas}")
-
 
 bot.run(str(sys.argv[1]), bot=True)
