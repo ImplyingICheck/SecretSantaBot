@@ -1,109 +1,67 @@
+import os
+import sys
+from collections.abc import Iterable
+
 import discord
 from discord.ext import commands
 
-from datetime import datetime
+from secret_santa_bot import chains_of_primes
 
-import sys
-import random
-
-intents = discord.Intents.default()
+_MY_GUILD = os.environ["GUILD_ID"]
 # intents = discord.Intents.none()
+intents = discord.Intents.default()
+# intents.message_content = True
 # intents.members = True
-bot = commands.Bot(command_prefix=">", intents=intents)
-intTime = datetime(2015, 2, 1, 15, 16, 17, 345)
-bot.lastFight = intTime
-bot.spite = True
+bot = commands.Bot(command_prefix="/", intents=intents)
 
 
 class Santa:
-    Name = ""
-    give = -1
-    receive = False
+    __slots__ = ["member", "target", "receive"]
 
-
-def checkDone(santas):
-    count = 0
-    last = -1
-    for x, i in enumerate(santas):
-        if i.receive == False:
-            last = x
-            count += 1
-    if count == 1 and (
-        santas[last].give == -1 and santas[last].receive == False
-    ):
-        reset(santas)
-        return False
-    elif count >= 1:
-        return False
-    else:
-        return True
-
-
-def reset(santas):
-    print("RESETTING")
-    for i in santas:
-        i.give = -1
-        i.receive = False
-    return
+    def __init__(self, member: discord.Member):
+        self.member = member
+        self.target: discord.Member | None = None
 
 
 @bot.event
 async def on_ready():
     """Required permissions: None"""
+    await bot.tree.sync(guild=discord.Object(id=_MY_GUILD))
     print("Bot is ready to bot it up")
 
 
-@bot.command(pass_context=True)
-async def santa(ctx, *args):
-    server = ctx.guild
-    channel = ctx.channel
-    if server.owner.name == ctx.author.name:
-        role_name = " ".join(args)
-        role_id = server.roles[0]
-        for role in server.roles:
-            if role_name.lower() == role.name.lower():
-                role_id = role
-                break
-        else:
-            await channel.send(f"{role_name} Role does not exist")
-            return
-        members = role_id.members
-        names = []
-        for member in members:
-            names.append(member.name)
-        santas = [Santa() for i in range(len(names))]
-        for i in range(0, len(santas)):
-            santas[i].Name = names[i]
-        while not checkDone(santas):
-            giver = random.randint(
-                0, len(santas) - 1
-            )  # Pick a random person to give a gift
-            if (
-                santas[giver].give != -1
-            ):  # Check if that person is already giving a gift
-                continue
-            receiver = random.randint(
-                0, len(santas) - 1
-            )  # Pick a random person to receive a gift
-            while santas[receiver].receive == True or receiver == giver:
-                receiver = random.randint(0, len(santas) - 1)
-            santas[receiver].receive = True
-            santas[giver].give = receiver
-        for x, i in enumerate(santas):
-            await members[x].send(
-                (
-                    f"You will be giving a gift to {santas[i.give].Name}\nNote "
-                    f"that this is their discord name and not the name that will "
-                    f"be within the rules and information file\nThe rules and "
-                    f"information for this year along with the addresses of "
-                    f"everyone will be in the Secret Santa thread within the "
-                    f"{server.name} server. The thread may close after a time but "
-                    f"can still be viewed by clicking on the threads button -> "
-                    f"Archived -> Private"
-                )
+async def message_santas(santas: Iterable[Santa]):
+    for santa in santas:
+        member = santa.member
+        await member.send(
+            (
+                f"You will be giving a gift to {santa.target}\nNote "
+                f"that this is their discord name and not the name that will "
+                f"be within the rules and information file\nThe rules and "
+                f"information for this year along with the addresses of "
+                f"everyone will be in the Secret Santa thread within the "
+                f"{member.guild.name} server. The thread may close after a time"
+                f" but can still be viewed by clicking on the threads button ->"
+                f" Archived -> Private"
             )
+        )
+
+
+@bot.tree.command(guild=discord.Object(id=_MY_GUILD))
+async def santa(interaction: discord.Interaction, role: discord.Role):
+    """Required permissions: View Channels, Send Messages, Read Messages/View Channels
+    Intents.message_content"""
+    guild_owner = interaction.guild.owner_id
+    command_invoker = interaction.user.id
+    if guild_owner == command_invoker:
+        santas = [Santa(member) for member in role.members]
+        santas.sort(key=lambda santa: santa.member.id)
+        santas = chains_of_primes.assign_santas(santas)
+        await message_santas(santas)
     else:
-        await channel.send("Only the owner can roll for secret santa")
+        await interaction.response.send_message(
+            "Only the owner can roll for secret santa"
+        )
 
 
 bot.run(str(sys.argv[1]))
