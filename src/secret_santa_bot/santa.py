@@ -1,14 +1,14 @@
 import discord
 from discord.ext import commands
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 import sys
 import random
-from asyncio import sleep
 
 intents = discord.Intents.default()
-intents.members = True
+# intents = discord.Intents.none()
+# intents.members = True
 bot = commands.Bot(command_prefix=">", intents=intents)
 intTime = datetime(2015, 2, 1, 15, 16, 17, 345)
 bot.lastFight = intTime
@@ -19,70 +19,6 @@ class Santa:
     Name = ""
     give = -1
     receive = False
-
-
-@bot.event
-async def on_voice_state_update(member, before, after):
-    if member.bot:
-        return
-    server = member.guild
-    disconnects = 0
-    if ((datetime.utcnow() - bot.lastFight) / timedelta(minutes=1)) <= 5:
-        return
-    else:
-        entries = []
-        async for entry in server.audit_logs(
-            limit=3, action=discord.AuditLogAction.member_disconnect
-        ):
-            if (datetime.utcnow() - entry.created_at) / timedelta(
-                minutes=1
-            ) < 1:
-                entries.append(entry)
-                disconnects += entry.extra.count
-        # Last disconnect fight was more than 3 minutes ago
-        if disconnects >= 3:
-            if before.channel is not None:
-                channel = before.channel
-            elif after.channel is not None:
-                channel = after.channel
-            bot.lastFight = datetime.utcnow()
-            await wcwbf(channel)
-
-
-def is_connected(ctx):
-    voice_client = discord.utils.get(ctx.bot.voice_clients, guild=ctx.guild)
-    return voice_client and voice_client.is_connected()
-
-
-async def wcwbf(channel):
-    voice_channel = channel
-    channel = None
-    if voice_channel is not None:
-        channel = voice_channel.name
-        vc = await voice_channel.connect()
-        song = discord.FFmpegOpusAudio(source="wcwbf.mp3")
-        print(song.is_opus())
-        vc.play(song)
-        while vc.is_playing():
-            await sleep(1)
-        await vc.disconnect()
-
-
-async def wcwbfctx(ctx, channel):
-    voice_channel = channel
-    channel = None
-    if is_connected(ctx):
-        await ctx.channel.send("Bot is already connected")
-        return
-    if voice_channel is not None:
-        channel = voice_channel.name
-        vc = await voice_channel.connect()
-        song = discord.FFmpegOpusAudio(source="wcwbf.mp3")
-        print(song.is_opus())
-        vc.play(song)
-        while vc.is_playing():
-            await sleep(1)
-        await vc.disconnect()
 
 
 def checkDone(santas):
@@ -113,43 +49,8 @@ def reset(santas):
 
 @bot.event
 async def on_ready():
+    """Required permissions: None"""
     print("Bot is ready to bot it up")
-
-
-@bot.event
-async def on_message(message):
-    if message.author.bot:
-        return
-    spiting = (
-        message.author.id == 193508802073460736
-        and message.content == "-skip"
-        and bot.spite
-    )
-    if spiting:
-        print("moving")
-        await message.channel.send("Stop skipping tracks bitch")
-        await message.author.move_to(None)
-    await bot.process_commands(message)
-
-
-@bot.command(pass_context=True)
-async def spite(ctx):
-    if bot.spite and ctx.guild.owner.name == ctx.author.name:
-        bot.spite = False
-        await ctx.channel.send("Kempke is no longer being spited")
-    elif not bot.spite and ctx.guild.owner.name == ctx.author.name:
-        bot.spite = True
-        await ctx.channel.send("Kempke is now being spited")
-
-
-@bot.command(pass_context=True)
-async def play(ctx):
-    server = ctx.guild
-    if server.owner.name == ctx.author.name:
-        if ctx.author.voice.channel == None:
-            await ctx.channel.send("Please join a voice channel")
-        else:
-            await wcwbfctx(ctx, ctx.author.voice.channel)
 
 
 @bot.command(pass_context=True)
@@ -188,17 +89,18 @@ async def santa(ctx, *args):
                 receiver = random.randint(0, len(santas) - 1)
             santas[receiver].receive = True
             santas[giver].give = receiver
-
         for x, i in enumerate(santas):
             await members[x].send(
-                (f"You will be giving a gift to {santas[i.give].Name}\nNote "
-                 f"that this is their discord name and not the name that will "
-                 f"be within the rules and information file\nThe rules and "
-                 f"information for this year along with the addresses of "
-                 f"everyone will be in the Secret Santa thread within the "
-                 f"{server.name} server. The thread may close after a time but "
-                 f"can still be viewed by clicking on the threads button -> "
-                 f"Archived -> Private")
+                (
+                    f"You will be giving a gift to {santas[i.give].Name}\nNote "
+                    f"that this is their discord name and not the name that will "
+                    f"be within the rules and information file\nThe rules and "
+                    f"information for this year along with the addresses of "
+                    f"everyone will be in the Secret Santa thread within the "
+                    f"{server.name} server. The thread may close after a time but "
+                    f"can still be viewed by clicking on the threads button -> "
+                    f"Archived -> Private"
+                )
             )
     else:
         await channel.send("Only the owner can roll for secret santa")
