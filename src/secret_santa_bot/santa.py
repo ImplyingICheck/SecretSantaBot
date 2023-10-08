@@ -28,7 +28,6 @@ async def on_voice_state_update(member, before, after):
     server = member.guild
     disconnects = 0
     if ((datetime.utcnow() - bot.lastFight) / timedelta(minutes=1)) <= 5:
-        # print("On cooldown")
         return
     else:
         entries = []
@@ -38,7 +37,6 @@ async def on_voice_state_update(member, before, after):
             if (datetime.utcnow() - entry.created_at) / timedelta(
                 minutes=1
             ) < 1:
-                # print("Adding an entry")
                 entries.append(entry)
                 disconnects += entry.extra.count
         # Last disconnect fight was more than 3 minutes ago
@@ -193,10 +191,17 @@ async def santa(ctx, *args):
 
         for x, i in enumerate(santas):
             await members[x].send(
-                f"You will be giving a gift to {santas[i.give].Name}\nNote that this is their discord name and not the name that will be within the rules and information file\nThe rules and information for this year along with the addresses of everyone will be in the Secret Santa thread within the {server.name} server. The thread may close after a time but can still be viewed by clicking on the threads button -> Archived -> Private"
+                (f"You will be giving a gift to {santas[i.give].Name}\nNote "
+                 f"that this is their discord name and not the name that will "
+                 f"be within the rules and information file\nThe rules and "
+                 f"information for this year along with the addresses of "
+                 f"everyone will be in the Secret Santa thread within the "
+                 f"{server.name} server. The thread may close after a time but "
+                 f"can still be viewed by clicking on the threads button -> "
+                 f"Archived -> Private")
             )
     else:
         await channel.send("Only the owner can roll for secret santa")
 
 
-bot.run(str(sys.argv[1]), bot=True)
+bot.run(str(sys.argv[1]))
