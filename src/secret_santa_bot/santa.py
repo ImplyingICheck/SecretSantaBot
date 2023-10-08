@@ -9,14 +9,14 @@ from asyncio import sleep
 
 intents = discord.Intents.default()
 intents.members = True
-bot = commands.Bot(command_prefix='>', intents=intents)
+bot = commands.Bot(command_prefix=">", intents=intents)
 intTime = datetime(2015, 2, 1, 15, 16, 17, 345)
 bot.lastFight = intTime
 bot.spite = True
 
 
 class Santa:
-    Name = ''
+    Name = ""
     give = -1
     receive = False
 
@@ -197,5 +197,6 @@ async def santa(ctx, *args):
             )
     else:
         await channel.send("Only the owner can roll for secret santa")
+
 
 bot.run(str(sys.argv[1]), bot=True)
