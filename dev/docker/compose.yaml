@@ -1,8 +1,11 @@
 services:
   bot:
     build:
-      context: .
-      dockerfile: dev/docker/Dockerfile
+      context: ../..
+      dockerfile: ./dev/docker/Dockerfile
+    environment:
+      VAULT_PATH: 'http://vault:8200'
+      VAULT_TOKEN: 'my_root'
     networks:
       - santas_workshop
   secrets:
