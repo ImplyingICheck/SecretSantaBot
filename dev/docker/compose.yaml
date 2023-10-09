@@ -3,6 +3,8 @@ services:
     build:
       context: ../..
       dockerfile: ./dev/docker/Dockerfile
+    volumes:
+      - ../../src:/app
     environment:
       VAULT_PATH: 'http://vault:8200'
       VAULT_TOKEN: 'my_root'
