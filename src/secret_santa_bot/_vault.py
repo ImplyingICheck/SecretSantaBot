@@ -5,7 +5,7 @@ from hvac.api import secrets_engines
 
 
 class Vault(hvac.Client):
-    _APPLICATION_NAME = 'SecretSantaBot'
+    _APPLICATION_NAME = 'secretsantabot'
     _TOKEN_USERNAME = 'token'
 
     def __init__(self, url: str, token: str, **kwargs: Any):

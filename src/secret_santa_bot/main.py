@@ -9,7 +9,7 @@ def main():
     vault: _vault.Vault = _vault.Vault(
         url=os.environ['VAULT_PATH'], token=os.environ['VAULT_TOKEN']
     )
-    os.environ['GUILD_ID'] = vault.read_secret_token(username='GUILD_ID')
+    os.environ['GUILD_ID'] = vault.read_secret_token(username='guild_id')
     discord_authentication_token: str = vault.read_secret_token()
     import secret_santa_bot.bot.santa
 
