@@ -8,29 +8,28 @@ from discord.ext import commands
 from secret_santa_bot import chains_of_primes
 
 _MY_GUILD = os.environ["GUILD_ID"]
-# intents = discord.Intents.none()
-intents = discord.Intents.default()
-# intents.message_content = True
-# intents.members = True
-bot = commands.Bot(command_prefix="/", intents=intents)
+# TODO: Find minimum set of permissions required
+bot: commands.Bot = commands.Bot(
+    command_prefix="/", intents=discord.Intents.default()
+)
 
 
 class Santa:
     __slots__ = ["member", "target", "receive"]
 
     def __init__(self, member: discord.Member):
-        self.member = member
+        self.member: discord.Member = member
         self.target: discord.Member | None = None
 
 
 @bot.event
-async def on_ready():
+async def on_ready() -> None:
     """Required permissions: None"""
     await bot.tree.sync(guild=discord.Object(id=_MY_GUILD))
     print("Bot is ready to bot it up")
 
 
-async def message_santas(santas: Iterable[Santa]):
+async def message_santas(santas: Iterable[Santa]) -> None:
     for santa in santas:
         member = santa.member
         await member.send(
@@ -51,7 +50,10 @@ async def message_santas(santas: Iterable[Santa]):
 async def santa(interaction: discord.Interaction, role: discord.Role):
     """Required permissions: View Channels, Send Messages, Read Messages/View Channels
     Intents.message_content"""
-    guild_owner = interaction.guild.owner_id
+    if interaction.guild:
+        guild_owner = interaction.guild.owner_id
+    else:
+        guild_owner = object()
     command_invoker = interaction.user.id
     if guild_owner == command_invoker:
         santas = [Santa(member) for member in role.members]
@@ -64,4 +66,6 @@ async def santa(interaction: discord.Interaction, role: discord.Role):
         )
 
 
-bot.run(str(sys.argv[1]))
+def main(discord_authentication_token: str, /) -> None:
+    """Runs the SecretSantaBot. This function is locking."""
+    bot.run(discord_authentication_token)

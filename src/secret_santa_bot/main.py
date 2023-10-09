@@ -2,35 +2,48 @@
 used by the bot."""
 import os
 import pathlib
-import subprocess
-import sys
+from typing import Any
 
 import hvac
 import hvac.exceptions
+from hvac.api import secrets_engines
 
-_APPLICATION_NAME = 'SecretSantaBot'
-_TOKEN_USERNAME = 'token'
-
+import secret_santa_bot.santa
 
 class Vault(hvac.Client):
-    def __init__(self, url: str, token: str, **kwargs):
-        super().__init__(url=url, token=token, **kwargs)
-        self.vault = self.secrets.kv.v2
+    _APPLICATION_NAME = 'SecretSantaBot'
+    _TOKEN_USERNAME = 'token'
 
-    def read_secret_token(self,
-        service_name: str = _APPLICATION_NAME, username: str = _TOKEN_USERNAME
-    ) -> str | None:
+    def __init__(self, url: str, token: str, **kwargs: Any):
+        super().__init__(url=url, token=token, **kwargs)
+        # hvac.Client.secrets.kv.v2 is type magic done by hvac for reference secrets_engines.KvV2
+        self.vault: secrets_engines.KvV2 = self.secrets.kv.v2  # type: ignore
+
+    def read_secret_token(
+        self,
+        service_name: str = _APPLICATION_NAME,
+        username: str = _TOKEN_USERNAME,
+    ) -> str:
         try:
-            return self.vault.read_secret(path=service_name)['data']['data'][username]
+            return self.vault.read_secret(path=service_name)['data']['data'][
+                username
+            ]
         except hvac.exceptions.InvalidPath:
             return self.prompt_user_for_token_sync()
 
-    def prompt_user_for_token_sync(self):
-        token = input(f'No {_TOKEN_USERNAME} found for {_APPLICATION_NAME}.\nEnter an API token: ')
-        self.vault.create_or_update_secret(path=_APPLICATION_NAME, secret={_TOKEN_USERNAME: token})
+    def prompt_user_for_token_sync(self) -> str:
+        token = input(
+            f'No {self._TOKEN_USERNAME} found for {self._APPLICATION_NAME}.\n'
+            f'Enter an API token: '
+        )
+        token = token.strip()
+        self.vault.create_or_update_secret(
+            path=self._APPLICATION_NAME, secret={self._TOKEN_USERNAME: token}
+        )
         return token
 
-def _get_secret_santa_bot_path():
+
+def _get_secret_santa_bot_path() -> pathlib.Path[str]:
     file_depth = 1
     root_directory = pathlib.Path(__file__).parents[file_depth]
     secret_santa_bot_script = root_directory.joinpath(
@@ -38,9 +51,11 @@ def _get_secret_santa_bot_path():
     )
     return secret_santa_bot_script
 
+
 if __name__ == '__main__':
-    vault = Vault(url='http://localhost:8200',
-    token=os.environ['VAULT_TOKEN'])
-    script_path = _get_secret_santa_bot_path()
-    discord_authentication_token = vault.read_secret_token()
-    subprocess.run([sys.executable, script_path, discord_authentication_token])
+    vault: Vault = Vault(
+        url='http://vault:8200', token=os.environ['VAULT_TOKEN']
+    )
+    script_path: pathlib.Path[str] = _get_secret_santa_bot_path()
+    discord_authentication_token: str = vault.read_secret_token()
+    secret_santa_bot.santa.main(discord_authentication_token)

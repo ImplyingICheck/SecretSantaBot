@@ -3,7 +3,7 @@ from __future__ import annotations
 import itertools
 import math
 from collections.abc import Iterable, Sequence
-from typing import TYPE_CHECKING
+from typing import Literal, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
@@ -32,7 +32,20 @@ def is_prime(n: int) -> bool:
         return False
 
 
-def check_compliment(candidate: int, sum: int):
+def check_compliment(
+    candidate: int, sum: int
+) -> tuple[int, int] | Literal[False]:
+    """Verifies that two summands are prime.
+
+    Args:
+        candidate: A number to be tested. One of the two summands is sufficient
+            to uniquely identify the pair.
+        sum: The result to which the candidate and compliment sum to
+
+    Returns:
+        A tuple of (int, int) if the candidate and compliment are both prime.
+        Otherwise, False.
+    """
     compliment = sum - candidate
     if is_prime(candidate) and is_prime(compliment):
         return candidate, compliment
@@ -72,8 +85,8 @@ def prime_decomposition(n: int) -> Iterable[int]:
         return odd_decomposition(n)
 
 
-def adjust_index(decomposition: Iterable[int]):
-    adjusted_index = []
+def adjust_index(decomposition: Iterable[int]) -> list[int]:
+    adjusted_index: list[int] = []
     current_sum = 0
     for entry in decomposition:
         current_sum += entry
@@ -81,11 +94,13 @@ def adjust_index(decomposition: Iterable[int]):
     return adjusted_index
 
 
-def make_prime_sets(santas: Sequence[Santa]):
+def convert_to_prime_sized_sets(
+    santas: Sequence[Santa],
+) -> list[Sequence[Santa]]:
     """Makes sets A for which |A| is a prime number."""
     decomposition = prime_decomposition(len(santas))
     decomposition = adjust_index(decomposition)
-    mappings = []
+    mappings: list[Sequence[Santa]] = []
     lower_boundary = 0
     for upper_boundary in decomposition:
         prime_mapping = santas[lower_boundary:upper_boundary]
@@ -94,7 +109,10 @@ def make_prime_sets(santas: Sequence[Santa]):
     return mappings
 
 
-def connect_graph(santas: Sequence[Santa]):
+def connect_graph(santas: Sequence[Santa]) -> None:
+    """Updates Santa.target to be another Santa within the Sequence.
+
+    Uses the cyclical nature of the modulo of prime number multiples."""
     n = len(santas)
     k = generate_coprime(n)
     current_santa = santas[0]
@@ -104,43 +122,22 @@ def connect_graph(santas: Sequence[Santa]):
         current_santa = santas[target_index]
 
 
-def verify_interconnectivity(mappings: Sequence[Sequence[Santa]]):
-    """Checks that every number is present in and that the mapping is circular."""
-    flattened_mapping = list(itertools.chain.from_iterable(mappings))
-    member_sum = 0
-    target_sum = 0
-    for entry in flattened_mapping:
-        member_sum += entry.member or 0
-        target_sum += entry.target or 0
-    if not member_sum == target_sum:
-        print(mappings)
-    sentinel = flattened_mapping[0]
-    current_entry = flattened_mapping[0]
-    joins = 0
-    first = True
-    while first or current_entry is not sentinel:
-        if first:
-            first = False
-        target_index = current_entry.target
-        current_entry = flattened_mapping[target_index]
-        joins += 1
-    if joins != len(flattened_mapping):
-        print(mappings)
-
-
-def connect_disjoint_graphs(mappings):
+def connect_disjoint_graphs(mappings: Sequence[Sequence[Santa]]) -> None:
+    """Sets the last Santa of a subsequence to target the first santa of the
+    following subsequence. Assuming each subsequence is cyclically connected, we
+    can swap the targets of any two Santas belonging to distinct subsequences to
+    create a combined, cyclically-connected subsequence."""
     for left_mapping, right_mapping in itertools.pairwise(mappings):
         left_mapping[-1].target, right_mapping[0].target = (
             right_mapping[0].target,
             left_mapping[-1].target,
         )
-    return mappings
 
 
-def assign_santas(santas: Sequence[Santa]):
-    mappings = make_prime_sets(santas)
+def assign_santas(santas: Sequence[Santa]) -> list[Santa]:
+    mappings = convert_to_prime_sized_sets(santas)
     for mapping in mappings:
         connect_graph(mapping)
-    mappings = connect_disjoint_graphs(mappings)
-    return itertools.chain.from_iterable(mappings)
-    # verify_interconnectivity(mappings)
+    connect_disjoint_graphs(mappings)
+    mappings = itertools.chain.from_iterable(mappings)
+    return list(mappings)
