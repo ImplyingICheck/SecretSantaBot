@@ -7,7 +7,6 @@ from discord.ext import commands
 from secret_santa_bot.bot import chains_of_primes
 
 
-_MY_GUILD = os.environ["GUILD_ID"]
 # TODO: Find minimum set of permissions required
 bot: commands.Bot = commands.Bot(
     command_prefix="/", intents=discord.Intents.default()
@@ -25,7 +24,7 @@ class Santa:
 @bot.event
 async def on_ready() -> None:
     """Required permissions: None"""
-    await bot.tree.sync(guild=discord.Object(id=_MY_GUILD))
+    await bot.tree.sync(guild=discord.Object(id=os.environ["GUILD_ID"]))
     print("Bot is ready to bot it up")
 
 
@@ -46,7 +45,7 @@ async def message_santas(santas: Iterable[Santa]) -> None:
         )
 
 
-@bot.tree.command(guild=discord.Object(id=_MY_GUILD))
+@bot.tree.command(guild=discord.Object(id=os.environ["GUILD_ID"]))
 async def santa(interaction: discord.Interaction, role: discord.Role):
     """Required permissions: View Channels, Send Messages, Read Messages/View Channels
     Intents.message_content"""
