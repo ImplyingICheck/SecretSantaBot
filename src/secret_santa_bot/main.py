@@ -8,7 +8,7 @@ import hvac
 import hvac.exceptions
 from hvac.api import secrets_engines
 
-import secret_santa_bot.santa
+import secret_santa_bot.bot.santa
 
 class Vault(hvac.Client):
     _APPLICATION_NAME = 'SecretSantaBot'
@@ -43,7 +43,7 @@ class Vault(hvac.Client):
         return token
 
 
-def _get_secret_santa_bot_path() -> pathlib.Path[str]:
+def _get_secret_santa_bot_path() -> pathlib.Path:
     file_depth = 1
     root_directory = pathlib.Path(__file__).parents[file_depth]
     secret_santa_bot_script = root_directory.joinpath(
@@ -56,6 +56,6 @@ if __name__ == '__main__':
     vault: Vault = Vault(
         url='http://vault:8200', token=os.environ['VAULT_TOKEN']
     )
-    script_path: pathlib.Path[str] = _get_secret_santa_bot_path()
+    script_path: pathlib.Path = _get_secret_santa_bot_path()
     discord_authentication_token: str = vault.read_secret_token()
-    secret_santa_bot.santa.main(discord_authentication_token)
+    secret_santa_bot.bot.santa.main(discord_authentication_token)
