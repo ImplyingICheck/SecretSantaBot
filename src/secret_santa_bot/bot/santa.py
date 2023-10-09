@@ -1,11 +1,11 @@
 import os
-import sys
 from collections.abc import Iterable
 
 import discord
 from discord.ext import commands
 
-from secret_santa_bot import chains_of_primes
+from secret_santa_bot.bot import chains_of_primes
+
 
 _MY_GUILD = os.environ["GUILD_ID"]
 # TODO: Find minimum set of permissions required

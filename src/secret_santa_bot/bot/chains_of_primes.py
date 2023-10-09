@@ -7,7 +7,7 @@ from typing import Literal, TYPE_CHECKING
 
 
 if TYPE_CHECKING:
-    from secret_santa_bot.santa import Santa
+    from secret_santa_bot.bot.santa import Santa
 
 
 def generate_coprime(n: int) -> int:
