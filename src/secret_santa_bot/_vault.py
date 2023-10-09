@@ -18,26 +18,33 @@ class Vault(hvac.Client):
         service_name: str = _APPLICATION_NAME,
         username: str = _TOKEN_USERNAME,
     ) -> str:
+        """Reads a secret token from the Vault. If not present, prompts the
+        caller for a token, then creates it under that *username*."""
         try:
-            return self.vault.read_secret(path=service_name)['data']['data'][
-                username
-            ]
-        except (hvac.exceptions.InvalidPath, KeyError):
-            return self.prompt_user_for_token(
-                service_name=service_name, username=username
-            )
+            secret = self.vault.read_secret(path=service_name)['data']['data']
+        except hvac.exceptions.InvalidPath:
+            request_if_error = {'service_name': service_name, 'username': username}
+        else:
+            try:
+                return secret[username]
+            except KeyError:
+                request_if_error = {'service_name': service_name, 'username': username, 'secret_data': secret}
+        return self.prompt_user_for_token(**request_if_error)
 
     def prompt_user_for_token(
-        self,
-        service_name,
-        username,
+        self, service_name: str, username: str, secret_data: dict[str, Any] | None = None
     ) -> str:
         token = input(
             f'No {username} found for {service_name}.\n'
             f'Enter a new {username}: '
         )
         token = token.strip()
+        new_secret = {username: token}
+        if secret_data:
+            secret_data.update(new_secret)
+        else:
+            secret_data = new_secret
         self.vault.create_or_update_secret(
-            path=service_name, secret={username: token}
+            path=service_name, secret=secret_data
         )
-        return token
+        return self.read_secret_token(service_name, username)
