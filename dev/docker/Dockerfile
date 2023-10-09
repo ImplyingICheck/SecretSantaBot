@@ -38,6 +38,8 @@ USER appuser
 # Copy the source code into the container.
 COPY src .
 
+ENV PYTHONPATH "${PYTHONPATH}:src"
+
 # Run the application.
 CMD python secret_santa_bot/main.py
 
