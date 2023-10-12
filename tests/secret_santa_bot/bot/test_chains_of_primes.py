@@ -134,3 +134,16 @@ class TestEvenDecomposition:
     def test_even_decomposition_odd(self):
         with pytest.raises(ValueError, match='must be even'):
             chains_of_primes._even_decomposition(9)
+
+
+class TestOddDecomposition:
+
+    def test_odd_decomposition_return_prime(self):
+        return_value = chains_of_primes._odd_decomposition(11)
+        is_prime = [chains_of_primes.is_prime(value) for value in return_value]
+        assert all(is_prime)
+
+    def test_odd_decomposition_return_sum(self):
+        expected_value = 11
+        return_value = chains_of_primes._odd_decomposition(expected_value)
+        assert sum(return_value) == expected_value

@@ -10,6 +10,8 @@ from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from secret_santa_bot.bot.santa import Santa
 
+_PRIME_CYCLE = 6
+
 
 def _generate_coprime(n: int) -> int:
     """This function should only be used with chains_of_primes._connect_graph.
@@ -73,12 +75,17 @@ def _even_decomposition(n: int) -> tuple[int, int]:
         A tuple of two prime numbers whose sum is *n*. No guarantees are made
         other than the return value is prime and sum to *n*.
     """
-    if n <= 6:
-        raise ValueError('The number to be decomposed must be greater than 6.')
+    if n <= _PRIME_CYCLE:
+        raise ValueError(
+            (
+                f'The number to be decomposed must be greater than '
+                f'{_PRIME_CYCLE}.'
+            )
+        )
     if n % 2 == 1:
         raise ValueError('The number to be decomposed must be even.')
     start = n // 6 * 6
-    for candidate_median in range(start, 0, -6):
+    for candidate_median in range(start, 0, -_PRIME_CYCLE):
         if decomposition := _check_compliment(candidate_median + 1, n):
             return decomposition
         if decomposition := _check_compliment(candidate_median - 1, n):
@@ -86,15 +93,28 @@ def _even_decomposition(n: int) -> tuple[int, int]:
     raise RuntimeWarning('Mr. Gold is going to be real mad.')
 
 
-def _odd_decomposition(n: int) -> tuple[int, int, int]:
+def _odd_decomposition(n: int) -> tuple[int, ...]:
     """Decomposition based on Goldbach's weak conjecture. See
-    santa._even_decomposition for further detail."""
+    santa._even_decomposition for further detail.
+
+    Implementation detail: special checks are done in
+    chains_of_primes._prime_decomposition to improve coverage. This function
+    should not hand off directly to chains_of_primes._even_decomposition.
+
+    Args:
+        n: An odd integer
+
+    Returns:
+        While the naive implementation returns 3 as the last integer in the
+        tuple, this is not guaranteed and should not be relied upon.
+    """
+    if n % 2 == 0:
+        raise ValueError('The number to be decomposed must be odd.')
     even_number = n - 3
-    decomposition, compliment = _prime_decomposition(even_number)
-    return decomposition, compliment, 3
+    return *_prime_decomposition(even_number), 3
 
 
-def _prime_decomposition(n: int) -> Iterable[int]:
+def _prime_decomposition(n: int) -> tuple[int, ...]:
     if is_prime(n):
         return (n,)
     elif n in [4, 6]:
