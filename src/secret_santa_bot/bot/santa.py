@@ -16,7 +16,7 @@ class Bot(commands.Bot):
 
     def __init__(
         self,
-        command_prefix: commands.bot.PrefixType[commands.bot.BotT] | None = None,  # type: ignore # Ignored due to a bug in type hints of discord.py
+        command_prefix: commands.bot.PrefixType[commands.bot.BotT] | None = None,  # type: ignore # Ignored due to a bug in type hints of discord.py # pylint: disable=line-too-long
         *,
         intents: discord.Intents | None = None,
         **options: Any,
@@ -64,17 +64,21 @@ async def message_santa(santa: Santa) -> bool:
         )
         successful = True
     except discord.errors.Forbidden:
-        logging.error(f'Unable to message "{santa.member}". The user may have '
-                      f'messaging from non-friend server memebers disabled.')
+        logging.error(
+            f'Unable to message "{santa.member}". The user may have '
+            f'messaging from non-friend server memebers disabled.'
+        )
     except AttributeError:
         # Bot attempts to message itself
         successful = True
     return successful
 
+
 def create_santas(role: discord.Role) -> list[Santa]:
     santas = [Santa(member) for member in role.members]
     santas.sort(key=lambda santa: santa.member.id)
     return santas
+
 
 async def message_santas(role: discord.Role):
     santas = create_santas(role)
@@ -97,7 +101,9 @@ async def santa(interaction: discord.Interaction, role: discord.Role):
             response_message = 'Santas successfully messaged.'
         else:
             response_message = 'Error during operation. Check log for details.'
-        await interaction.response.send_message(response_message, ephemeral=True)
+        await interaction.response.send_message(
+            response_message, ephemeral=True
+        )
     else:
         await interaction.response.send_message(
             'Only the owner can roll for secret santa', ephemeral=True
