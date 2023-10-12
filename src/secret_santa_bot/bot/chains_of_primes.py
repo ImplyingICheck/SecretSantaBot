@@ -12,7 +12,16 @@ if TYPE_CHECKING:
 
 
 def _generate_coprime(n: int) -> int:
-    # coprime of 0 gives a step size of 1 in santa._connect_graph
+    """This function should only be used with chains_of_primes._connect_graph.
+    It returns 0 when n < 3 to remain internally consistent.
+
+    Args:
+        n: An integer for which to generate a co-prime.
+
+    Returns:
+        An integer co-prime with *n*.
+    """
+    # coprime of 0 gives a step size of 1 in chains_of_primes._connect_graph
     if n < 3:
         return 0
     coprime = 3
