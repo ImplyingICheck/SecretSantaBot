@@ -22,7 +22,7 @@ class Bot(commands.Bot):
         **options: Any,
     ):
         if not command_prefix:
-            command_prefix = "/"
+            command_prefix = '/'
         if not intents:
             intents = discord.Intents.default()
             intents.members = True
@@ -33,7 +33,7 @@ bot = Bot()
 
 
 class Santa:
-    __slots__ = ["member", "target", "receive"]
+    __slots__ = ['member', 'target', 'receive']
 
     def __init__(self, member: discord.Member):
         self.member: discord.Member = member
@@ -43,8 +43,8 @@ class Santa:
 @bot.event
 async def on_ready() -> None:
     """Required permissions: None"""
-    await bot.tree.sync(guild=discord.Object(id=os.environ["GUILD_ID"]))
-    print("Bot is ready to bot it up")
+    await bot.tree.sync(guild=discord.Object(id=os.environ['GUILD_ID']))
+    print('Bot is ready to bot it up')
 
 
 async def message_santa(santa: Santa) -> bool:
@@ -52,20 +52,20 @@ async def message_santa(santa: Santa) -> bool:
     try:
         await santa.member.send(
             (
-                f"You will be giving a gift to {santa.target}\nNote "
-                f"that this is their discord name and not the name that will "
-                f"be within the rules and information file\nThe rules and "
-                f"information for this year along with the addresses of "
-                f"everyone will be in the Secret Santa thread within the "
-                f"{santa.member.guild.name} server. The thread may close after "
-                f"a time but can still be viewed by clicking on the threads "
-                f"button -> Archived -> Private"
+                f'You will be giving a gift to {santa.target}\nNote '
+                f'that this is their discord name and not the name that will '
+                f'be within the rules and information file\nThe rules and '
+                f'information for this year along with the addresses of '
+                f'everyone will be in the Secret Santa thread within the '
+                f'{santa.member.guild.name} server. The thread may close after '
+                f'a time but can still be viewed by clicking on the threads '
+                f'button -> Archived -> Private'
             )
         )
         successful = True
     except discord.errors.Forbidden:
-        logging.error(f"Unable to message '{santa.member}'. The user may have "
-                      f"messaging from non-friend server memebers disabled.")
+        logging.error(f'Unable to message "{santa.member}". The user may have '
+                      f'messaging from non-friend server memebers disabled.')
     except AttributeError:
         # Bot attempts to message itself
         successful = True
@@ -83,7 +83,7 @@ async def message_santas(role: discord.Role):
     return await asyncio.gather(*messages)
 
 
-@bot.tree.command(guild=discord.Object(id=os.environ["GUILD_ID"]))
+@bot.tree.command(guild=discord.Object(id=os.environ['GUILD_ID']))
 async def santa(interaction: discord.Interaction, role: discord.Role):
     """Required permissions:"""
     if interaction.guild:
@@ -94,13 +94,13 @@ async def santa(interaction: discord.Interaction, role: discord.Role):
     if guild_owner == command_invoker:
         message_successful = await message_santas(role)
         if not all(message_successful):
-            response_message = "Santas successfully messaged."
+            response_message = 'Santas successfully messaged.'
         else:
-            response_message = "Error during operation. Check log for details."
+            response_message = 'Error during operation. Check log for details.'
         await interaction.response.send_message(response_message, ephemeral=True)
     else:
         await interaction.response.send_message(
-            "Only the owner can roll for secret santa", ephemeral=True
+            'Only the owner can roll for secret santa', ephemeral=True
         )
 
 
