@@ -92,7 +92,7 @@ async def _message_santas(role: discord.Role):
 
 
 @bot.tree.command(guild=discord.Object(id=os.environ['GUILD_ID']))
-async def santa(interaction: discord.Interaction, role: discord.Role):
+async def secret_santa(interaction: discord.Interaction, role: discord.Role):
     """Required permissions:"""
     if interaction.guild:
         guild_owner = interaction.guild.owner_id
