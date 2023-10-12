@@ -153,11 +153,11 @@ def _convert_to_prime_sized_sets(
     santas: Sequence[Santa],
 ) -> list[Sequence[Santa]]:
     """Makes sets A for which |A| is a prime number."""
-    decomposition = prime_decomposition(len(santas))
-    decomposition = _adjust_index(decomposition)
+    decomposition_indices = prime_decomposition(len(santas))
+    decomposition_indices = _adjust_index(decomposition_indices)
     mappings: list[Sequence[Santa]] = []
     lower_boundary = 0
-    for upper_boundary in decomposition:
+    for upper_boundary in decomposition_indices:
         prime_mapping = santas[lower_boundary:upper_boundary]
         mappings.append(prime_mapping)
         lower_boundary = upper_boundary
