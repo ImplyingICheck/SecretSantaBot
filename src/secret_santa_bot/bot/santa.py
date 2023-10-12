@@ -1,5 +1,6 @@
 import os
 from collections.abc import Iterable
+from typing import Any
 
 import discord
 from discord.ext import commands
@@ -8,9 +9,24 @@ from secret_santa_bot.bot import chains_of_primes
 
 
 # TODO: Find minimum set of permissions required
-bot: commands.Bot = commands.Bot(
-    command_prefix="/", intents=discord.Intents.default()
-)
+class Bot(commands.Bot):
+
+    def __init__(
+        self,
+        command_prefix: commands.bot.PrefixType[commands.bot.BotT] | None = None,  # type: ignore # Ignored due to a bug in type hints of discord.py
+        *,
+        intents: discord.Intents | None = None,
+        **options: Any,
+    ):
+        if not command_prefix:
+            command_prefix = "/"
+        if not intents:
+            intents = discord.Intents.default()
+            intents.members = True
+        super().__init__(command_prefix, intents=intents, **options)
+
+
+bot = Bot()
 
 
 class Santa:
