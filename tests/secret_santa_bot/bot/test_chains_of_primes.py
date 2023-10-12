@@ -78,3 +78,30 @@ class TestGenerateCoprime:
             )
             == 1
         )
+
+
+class TestCheckCompliment:
+
+    def test_check_compliment_candidate_0(self):
+        assert chains_of_primes._check_compliment(0, 4) is False
+
+    def test_check_compliment_candidate_1(self):
+        assert chains_of_primes._check_compliment(1, 4) is False
+
+    def test_check_compliment_candidate_2(self):
+        assert chains_of_primes._check_compliment(2, 4) == (2, 2)
+
+    def test_check_compliment_candidate_negative(self):
+        assert chains_of_primes._check_compliment(-1, 3) is False
+
+    def test_check_compliment_compliment_1(self):
+        assert chains_of_primes._check_compliment(2, 3) is False
+
+    def test_check_compliment_candidate_prime_compliment_prime(self):
+        assert chains_of_primes._check_compliment(3, 5) == (3, 2)
+
+    def test_check_compliment_compliment_composite(self):
+        assert chains_of_primes._check_compliment(2, 6) is False
+
+    def test_check_compliment_candidate_composite(self):
+        assert chains_of_primes._check_compliment(4, 6) is False
