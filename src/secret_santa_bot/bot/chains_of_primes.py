@@ -63,10 +63,20 @@ def _check_compliment(
 
 
 def _even_decomposition(n: int) -> tuple[int, int]:
-    """Decomposes an even number into two primes using Goldbach's conjecture,
-    and that all primes p > 5 can be expressed as p = 6q ± 1."""
-    if n < 6:
+    """Decomposes an even number into two primes. Uses Goldbach's conjecture,
+    and that all primes p > 5 can be expressed as p = 6q ± 1.
+
+    Args:
+        n: An even integer
+
+    Returns:
+        A tuple of two prime numbers whose sum is *n*. No guarantees are made
+        other than the return value is prime and sum to *n*.
+    """
+    if n <= 6:
         raise ValueError('The number to be decomposed must be greater than 6.')
+    if n % 2 == 1:
+        raise ValueError('The number to be decomposed must be even.')
     start = n // 6 * 6
     for candidate_median in range(start, 0, -6):
         if decomposition := _check_compliment(candidate_median + 1, n):

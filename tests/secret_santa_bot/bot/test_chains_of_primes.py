@@ -105,3 +105,32 @@ class TestCheckCompliment:
 
     def test_check_compliment_candidate_composite(self):
         assert chains_of_primes._check_compliment(4, 6) is False
+
+
+class TestEvenDecomposition:
+
+    def test_even_decomposition_7(self):
+        with pytest.raises(ValueError, match='must be even'):
+            chains_of_primes._even_decomposition(7)
+
+    def test_even_decomposition_6(self):
+        with pytest.raises(ValueError, match='must be greater than 6'):
+            chains_of_primes._even_decomposition(6)
+
+    def test_even_decomposition_5(self):
+        with pytest.raises(ValueError, match='must be greater than 6'):
+            chains_of_primes._even_decomposition(5)
+
+    def test_even_decomposition_return_sums(self):
+        expected_value = 8
+        return_value = chains_of_primes._even_decomposition(expected_value)
+        assert sum(return_value) == expected_value
+
+    def test_even_decomposition_return_prime(self):
+        return_value = chains_of_primes._even_decomposition(8)
+        is_prime = [chains_of_primes.is_prime(value) for value in return_value]
+        assert all(is_prime)
+
+    def test_even_decomposition_odd(self):
+        with pytest.raises(ValueError, match='must be even'):
+            chains_of_primes._even_decomposition(9)
