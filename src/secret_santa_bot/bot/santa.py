@@ -1,3 +1,5 @@
+"""The main logic of SecretSantaBot. Contains commands and their associated
+helper functions."""
 from __future__ import annotations
 
 import asyncio
@@ -13,6 +15,7 @@ from secret_santa_bot.bot import chains_of_primes
 
 # TODO: Find minimum set of permissions required
 class Bot(commands.Bot):
+    """Sets "/" and default intents required by SecretSantaBot"""
 
     def __init__(
         self,
