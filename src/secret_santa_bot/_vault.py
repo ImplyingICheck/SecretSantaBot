@@ -1,7 +1,14 @@
-from typing import Any
+from typing import Any, NotRequired, TypedDict
 
 import hvac
 from hvac.api import secrets_engines
+from hvac import exceptions as hvac_exceptions
+
+
+class TokenRequest(TypedDict):
+    service_name: str
+    username: str
+    secret_data: NotRequired[dict[str, str]]
 
 
 class Vault(hvac.Client):
@@ -22,17 +29,27 @@ class Vault(hvac.Client):
         caller for a token, then creates it under that *username*."""
         try:
             secret = self.vault.read_secret(path=service_name)['data']['data']
-        except hvac.exceptions.InvalidPath:
-            request_if_error = {'service_name': service_name, 'username': username}
+        except hvac_exceptions.InvalidPath:
+            request_if_error: TokenRequest = {
+                'service_name': service_name,
+                'username': username,
+            }
         else:
             try:
                 return secret[username]
             except KeyError:
-                request_if_error = {'service_name': service_name, 'username': username, 'secret_data': secret}
+                request_if_error: TokenRequest = {
+                    'service_name': service_name,
+                    'username': username,
+                    'secret_data': secret,
+                }
         return self.prompt_user_for_token(**request_if_error)
 
     def prompt_user_for_token(
-        self, service_name: str, username: str, secret_data: dict[str, Any] | None = None
+        self,
+        service_name: str,
+        username: str,
+        secret_data: dict[str, Any] | None = None,
     ) -> str:
         token = input(
             f'No {username} found for {service_name}.\n'
