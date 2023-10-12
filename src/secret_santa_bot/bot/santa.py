@@ -50,7 +50,7 @@ async def on_ready() -> None:
     print('Bot is ready to bot it up')
 
 
-async def message_santa(santa: Santa) -> bool:
+async def _message_santa(santa: Santa) -> bool:
     successful = False
     try:
         await santa.member.send(
@@ -77,16 +77,16 @@ async def message_santa(santa: Santa) -> bool:
     return successful
 
 
-def create_santas(role: discord.Role) -> list[Santa]:
+def _create_santas(role: discord.Role) -> list[Santa]:
     santas = [Santa(member) for member in role.members]
     santas.sort(key=lambda santa: santa.member.id)
     return santas
 
 
-async def message_santas(role: discord.Role):
-    santas = create_santas(role)
+async def _message_santas(role: discord.Role):
+    santas = _create_santas(role)
     santas = chains_of_primes.assign_santas(santas)
-    messages = [message_santa(santa) for santa in santas]
+    messages = [_message_santa(santa) for santa in santas]
     return await asyncio.gather(*messages)
 
 
@@ -99,7 +99,7 @@ async def santa(interaction: discord.Interaction, role: discord.Role):
         guild_owner = object()
     command_invoker = interaction.user.id
     if guild_owner == command_invoker:
-        message_successful = await message_santas(role)
+        message_successful = await _message_santas(role)
         if not all(message_successful):
             response_message = 'Santas successfully messaged.'
         else:
