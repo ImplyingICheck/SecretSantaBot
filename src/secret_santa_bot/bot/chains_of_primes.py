@@ -23,14 +23,12 @@ def _generate_coprime(n: int) -> int:
 
 def _is_prime(n: int) -> bool:
     """Calculates if a number is prime by checking divisibility by squares."""
-    # try except handles the case where n == n // 6 * 6
-    try:
-        for divisor in range(2, math.floor(math.sqrt(n)) + 1):
-            if not n % divisor:
-                return False
-        return True
-    except ValueError:
+    if n <= 1:
         return False
+    for divisor in range(2, math.floor(math.sqrt(n)) + 1):
+        if not n % divisor:
+            return False
+    return True
 
 
 def _check_compliment(
