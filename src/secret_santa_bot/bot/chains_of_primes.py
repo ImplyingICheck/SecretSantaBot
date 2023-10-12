@@ -69,7 +69,7 @@ def _even_decomposition(n: int) -> tuple[int, int]:
     and that all primes p > 5 can be expressed as p = 6q ± 1.
 
     Args:
-        n: An even integer
+        n: An even integer in the range [8, ∞)
 
     Returns:
         A tuple of two prime numbers whose sum is *n*. No guarantees are made
@@ -102,7 +102,7 @@ def _odd_decomposition(n: int) -> tuple[int, ...]:
     should not hand off directly to chains_of_primes._even_decomposition.
 
     Args:
-        n: An odd integer
+        n: An odd integer in the range [5, ∞)
 
     Returns:
         While the naive implementation returns 3 as the last integer in the
