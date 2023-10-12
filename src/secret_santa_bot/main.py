@@ -11,7 +11,8 @@ def main():
     )
     os.environ['GUILD_ID'] = vault.read_secret_token(username='guild_id')
     discord_authentication_token: str = vault.read_secret_token()
-    import secret_santa_bot.bot.santa
+    # In-line import as discord.py uses function decorators to assign commands
+    import secret_santa_bot.bot.santa  # pylint: disable=import-outside-toplevel
 
     secret_santa_bot.bot.santa.main(discord_authentication_token)
 
