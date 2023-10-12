@@ -1,7 +1,9 @@
 # pylint: disable=[missing-module-docstring, missing-class-docstring, protected-access, redefined-outer-name]
 import math
+import os
 
 import pytest
+import pytest_mock
 
 from secret_santa_bot.bot import chains_of_primes
 
@@ -170,3 +172,38 @@ class TestPrimeDecomposition:
     def test_prime_decomposition_return_sum(self, large_prime):
         return_value = chains_of_primes.prime_decomposition(large_prime)
         assert sum(return_value) == large_prime
+
+
+@pytest.fixture
+def santas_fixture(mocker: pytest_mock.MockFixture, santas_len_fixture):
+    mocker.patch.dict(os.environ, {'GUILD_ID': '1'})
+    from secret_santa_bot.bot import santa  # pylint: disable=[import-outside-toplevel]
+
+    return [santa.Santa(mocker.Mock()) for _ in range(santas_len_fixture)]
+
+
+@pytest.fixture
+def santas_len_fixture():
+    return 10
+
+
+class TestAssignSantas:
+
+    def test_assign_santas_return_all_input(self, santas_fixture):
+        # pylint: disable=[unnecessary-lambda]
+        expected_return = [santa.member for santa in santas_fixture]
+        expected_return.sort(key=lambda x: id(x))
+        actual_return = chains_of_primes.assign_santas(santas_fixture)
+        actual_return = [santa.member for santa in actual_return]
+        actual_return.sort(key=lambda x: id(x))
+        assert expected_return == actual_return
+
+    def test_assign_santas_return_completely_connected(
+        self, santas_fixture, santas_len_fixture
+    ):
+        seen_members = set()
+        actual_return = chains_of_primes.assign_santas(santas_fixture)
+        for santa in actual_return:
+            target_id = id(santa.target)
+            seen_members.add(target_id)
+        assert len(seen_members) == santas_len_fixture
