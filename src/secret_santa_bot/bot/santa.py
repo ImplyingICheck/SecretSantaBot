@@ -63,8 +63,7 @@ async def message_santas(santas: Iterable[Santa]) -> None:
 
 @bot.tree.command(guild=discord.Object(id=os.environ["GUILD_ID"]))
 async def santa(interaction: discord.Interaction, role: discord.Role):
-    """Required permissions: View Channels, Send Messages, Read Messages/View Channels
-    Intents.message_content"""
+    """Required permissions:"""
     if interaction.guild:
         guild_owner = interaction.guild.owner_id
     else:
