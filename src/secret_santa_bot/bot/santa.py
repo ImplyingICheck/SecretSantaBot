@@ -68,8 +68,9 @@ async def _message_santa(santa: Santa) -> bool:
         successful = True
     except discord.errors.Forbidden:
         logging.error(
-            f'Unable to message "{santa.member}". The user may have '
-            f'messaging from non-friend server memebers disabled.'
+            'Unable to message "%s". The user may have messaging from '
+            'non-friend server members disabled.',
+            {santa.member.name},
         )
     except AttributeError:
         # Bot attempts to message itself
