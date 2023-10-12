@@ -147,3 +147,26 @@ class TestOddDecomposition:
         expected_value = 11
         return_value = chains_of_primes._odd_decomposition(expected_value)
         assert sum(return_value) == expected_value
+
+
+class TestPrimeDecomposition:
+
+    def test_prime_decomposition_2(self):
+        assert chains_of_primes.prime_decomposition(2) == (2,)
+
+    def test_prime_decomposition_1(self):
+        with pytest.raises(ValueError, match='greater than 1'):
+            chains_of_primes.prime_decomposition(1)
+
+    def test_prime_decomposition_0(self):
+        with pytest.raises(ValueError, match='greater than 1'):
+            chains_of_primes.prime_decomposition(0)
+
+    def test_prime_decomposition_return_prime(self, large_prime):
+        return_value = chains_of_primes.prime_decomposition(large_prime)
+        is_prime = [chains_of_primes.is_prime(value) for value in return_value]
+        assert all(is_prime)
+
+    def test_prime_decomposition_return_sum(self, large_prime):
+        return_value = chains_of_primes.prime_decomposition(large_prime)
+        assert sum(return_value) == large_prime

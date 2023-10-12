@@ -98,7 +98,7 @@ def _odd_decomposition(n: int) -> tuple[int, ...]:
     santa._even_decomposition for further detail.
 
     Implementation detail: special checks are done in
-    chains_of_primes._prime_decomposition to improve coverage. This function
+    chains_of_primes.prime_decomposition to improve coverage. This function
     should not hand off directly to chains_of_primes._even_decomposition.
 
     Args:
@@ -111,18 +111,33 @@ def _odd_decomposition(n: int) -> tuple[int, ...]:
     if n % 2 == 0:
         raise ValueError('The number to be decomposed must be odd.')
     even_number = n - 3
-    return *_prime_decomposition(even_number), 3
+    return *prime_decomposition(even_number), 3
 
 
-def _prime_decomposition(n: int) -> tuple[int, ...]:
-    if is_prime(n):
+def prime_decomposition(n: int) -> tuple[int, ...]:
+    """Generates the prime decomposition of an integer *n*.
+
+    Implementation detail: The set of if ... elif ... statements expand coverage
+    of integers from [2, 6] as these would raise an exception in
+    chains_of_primes._even_decomposition.
+
+    Args:
+        n: Any integer in the domain [2, ∞)
+
+    Returns:
+        The prime decomposition of *n*. No guarantees are made as to the content
+        other than the return values sum to *n* and are all prime.
+    """
+    if n <= 1:
+        raise ValueError(
+            f'Prime decomposition can only be done for n greater '
+            f'than 1. Received: {n}'
+        )
+    elif is_prime(n):
         return (n,)
     elif n in [4, 6]:
         return n // 2, n // 2
-    if n % 2 == 0:
-        return _even_decomposition(n)
-    else:
-        return _odd_decomposition(n)
+    return _even_decomposition(n) if n % 2 == 0 else _odd_decomposition(n)
 
 
 def _adjust_index(decomposition: Iterable[int]) -> list[int]:
@@ -138,7 +153,7 @@ def _convert_to_prime_sized_sets(
     santas: Sequence[Santa],
 ) -> list[Sequence[Santa]]:
     """Makes sets A for which |A| is a prime number."""
-    decomposition = _prime_decomposition(len(santas))
+    decomposition = prime_decomposition(len(santas))
     decomposition = _adjust_index(decomposition)
     mappings: list[Sequence[Santa]] = []
     lower_boundary = 0
