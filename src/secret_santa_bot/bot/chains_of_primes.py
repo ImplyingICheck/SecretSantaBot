@@ -20,6 +20,8 @@ def _generate_coprime(n: int) -> int:
 
     Returns:
         An integer co-prime with *n*.
+        If *n* is 3, the function returns 4 to prevent degenerate mapping in
+            chains_of_primes._connect_graph.
     """
     # coprime of 0 gives a step size of 1 in chains_of_primes._connect_graph
     if n < 3:
