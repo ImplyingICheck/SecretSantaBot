@@ -1,3 +1,4 @@
+"""Helper class to access secrets stored in "Hashicorp vault"."""
 from typing import Any, NotRequired, TypedDict
 
 import hvac
@@ -6,18 +7,24 @@ from hvac import exceptions as hvac_exceptions
 
 
 class TokenRequest(TypedDict):
+    """Type hint for parameters of prompt_user_token."""
+
     service_name: str
     username: str
     secret_data: NotRequired[dict[str, str]]
 
 
 class Vault(hvac.Client):
+    """Provides helper functions for accessing secrets stored in "Hashicorp
+    vault"."""
+
     _APPLICATION_NAME = 'secretsantabot'
     _TOKEN_USERNAME = 'token'
 
     def __init__(self, url: str, token: str, **kwargs: Any):
         super().__init__(url=url, token=token, **kwargs)
-        # hvac.Client.secrets.kv.v2 is type magic done by hvac for reference secrets_engines.KvV2
+        # hvac.Client.secrets.kv.v2 is type magic done by hvac for referencing
+        # secrets_engines.KvV2
         self.vault: secrets_engines.KvV2 = self.secrets.kv.v2  # type: ignore
 
     def read_secret_token(
