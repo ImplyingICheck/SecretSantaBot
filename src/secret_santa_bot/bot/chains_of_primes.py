@@ -21,7 +21,7 @@ def _generate_coprime(n: int) -> int:
     return coprime
 
 
-def _is_prime(n: int) -> bool:
+def is_prime(n: int) -> bool:
     """Calculates if a number is prime by checking divisibility by squares."""
     if n <= 1:
         return False
@@ -46,7 +46,7 @@ def _check_compliment(
         Otherwise, False.
     """
     compliment = target - candidate
-    if _is_prime(candidate) and _is_prime(compliment):
+    if is_prime(candidate) and is_prime(compliment):
         return candidate, compliment
     return False
 
@@ -74,7 +74,7 @@ def _odd_decomposition(n: int) -> tuple[int, int, int]:
 
 
 def _prime_decomposition(n: int) -> Iterable[int]:
-    if _is_prime(n):
+    if is_prime(n):
         return (n,)
     elif n in [4, 6]:
         return n // 2, n // 2
