@@ -18,11 +18,10 @@ _logger.handlers = logging.getLogger('hikari').handlers
 class SecretSantaBot(command_registration_mixin.CommandRegistrationMixin):
 
     async def ping(self, event: hikari.GuildMessageCreateEvent) -> None:
-        """If a non-bot user @ mentions your bot, respond with 'Pong!'."""
+        """If a non-bot user @ mentions SecretSantaBot, respond with 'Pong!'."""
         if not event.is_human:
             return
-        me = self.get_me()
-        if me.id in event.message.user_mentions_ids:
+        if self.id in event.message.user_mentions_ids:
             await event.message.respond('Pong!')
 
 
