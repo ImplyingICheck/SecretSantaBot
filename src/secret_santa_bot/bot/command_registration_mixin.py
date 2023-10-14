@@ -66,6 +66,12 @@ class CommandRegistrationMixin(hikari.GatewayBot):
             rest_url=rest_url,
         )
         self.register_commands()
+        self.id: hikari.Snowflake | None = None
+        self.listen()(self.set_application_id)
+
+    async def set_application_id(self, event: hikari.StartedEvent):
+        del event  # unused
+        self.id = self.get_me().id
 
     def register_commands(self):
         super_dir = get_super_dir(self)
