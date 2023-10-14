@@ -10,9 +10,22 @@ from typing import Literal, TYPE_CHECKING
 if TYPE_CHECKING:
     from secret_santa_bot.bot.santa import Santa
 
+_PRIME_CYCLE = 6
+
 
 def _generate_coprime(n: int) -> int:
-    # coprime of 0 gives a step size of 1 in santa._connect_graph
+    """This function should only be used with chains_of_primes._connect_graph.
+    It returns 0 when n < 3 to remain internally consistent.
+
+    Args:
+        n: An integer for which to generate a co-prime.
+
+    Returns:
+        An integer co-prime with *n*.
+        If *n* is 3, the function returns 4 to prevent degenerate mapping in
+            chains_of_primes._connect_graph.
+    """
+    # coprime of 0 gives a step size of 1 in chains_of_primes._connect_graph
     if n < 3:
         return 0
     coprime = 3
@@ -21,7 +34,7 @@ def _generate_coprime(n: int) -> int:
     return coprime
 
 
-def _is_prime(n: int) -> bool:
+def is_prime(n: int) -> bool:
     """Calculates if a number is prime by checking divisibility by squares."""
     if n <= 1:
         return False
@@ -46,18 +59,33 @@ def _check_compliment(
         Otherwise, False.
     """
     compliment = target - candidate
-    if _is_prime(candidate) and _is_prime(compliment):
+    if is_prime(candidate) and is_prime(compliment):
         return candidate, compliment
     return False
 
 
 def _even_decomposition(n: int) -> tuple[int, int]:
-    """Decomposes an even number into two primes using Goldbach's conjecture,
-    and that all primes p > 5 can be expressed as p = 6q ± 1."""
-    if n < 6:
-        raise ValueError('The number to be decomposed must be greater than 6.')
+    """Decomposes an even number into two primes. Uses Goldbach's conjecture,
+    and that all primes p > 5 can be expressed as p = 6q ± 1.
+
+    Args:
+        n: An even integer in the range [8, ∞)
+
+    Returns:
+        A tuple of two prime numbers whose sum is *n*. No guarantees are made
+        other than the return value is prime and sum to *n*.
+    """
+    if n <= _PRIME_CYCLE:
+        raise ValueError(
+            (
+                f'The number to be decomposed must be greater than '
+                f'{_PRIME_CYCLE}.'
+            )
+        )
+    if n % 2 == 1:
+        raise ValueError('The number to be decomposed must be even.')
     start = n // 6 * 6
-    for candidate_median in range(start, 0, -6):
+    for candidate_median in range(start, 0, -_PRIME_CYCLE):
         if decomposition := _check_compliment(candidate_median + 1, n):
             return decomposition
         if decomposition := _check_compliment(candidate_median - 1, n):
@@ -65,23 +93,51 @@ def _even_decomposition(n: int) -> tuple[int, int]:
     raise RuntimeWarning('Mr. Gold is going to be real mad.')
 
 
-def _odd_decomposition(n: int) -> tuple[int, int, int]:
+def _odd_decomposition(n: int) -> tuple[int, ...]:
     """Decomposition based on Goldbach's weak conjecture. See
-    santa._even_decomposition for further detail."""
+    santa._even_decomposition for further detail.
+
+    Implementation detail: special checks are done in
+    chains_of_primes.prime_decomposition to improve coverage. This function
+    should not hand off directly to chains_of_primes._even_decomposition.
+
+    Args:
+        n: An odd integer in the range [5, ∞)
+
+    Returns:
+        While the naive implementation returns 3 as the last integer in the
+        tuple, this is not guaranteed and should not be relied upon.
+    """
+    if n % 2 == 0:
+        raise ValueError('The number to be decomposed must be odd.')
     even_number = n - 3
-    decomposition, compliment = _prime_decomposition(even_number)
-    return decomposition, compliment, 3
+    return *prime_decomposition(even_number), 3
 
 
-def _prime_decomposition(n: int) -> Iterable[int]:
-    if _is_prime(n):
+def prime_decomposition(n: int) -> tuple[int, ...]:
+    """Generates the prime decomposition of an integer *n*.
+
+    Implementation detail: The set of if ... elif ... statements expand coverage
+    of integers from [2, 6] as these would raise an exception in
+    chains_of_primes._even_decomposition.
+
+    Args:
+        n: Any integer in the domain [2, ∞)
+
+    Returns:
+        The prime decomposition of *n*. No guarantees are made as to the content
+        other than the return values sum to *n* and are all prime.
+    """
+    if n <= 1:
+        raise ValueError(
+            f'Prime decomposition can only be done for n greater '
+            f'than 1. Received: {n}'
+        )
+    elif is_prime(n):
         return (n,)
     elif n in [4, 6]:
         return n // 2, n // 2
-    if n % 2 == 0:
-        return _even_decomposition(n)
-    else:
-        return _odd_decomposition(n)
+    return _even_decomposition(n) if n % 2 == 0 else _odd_decomposition(n)
 
 
 def _adjust_index(decomposition: Iterable[int]) -> list[int]:
@@ -97,11 +153,11 @@ def _convert_to_prime_sized_sets(
     santas: Sequence[Santa],
 ) -> list[Sequence[Santa]]:
     """Makes sets A for which |A| is a prime number."""
-    decomposition = _prime_decomposition(len(santas))
-    decomposition = _adjust_index(decomposition)
+    decomposition_indices = prime_decomposition(len(santas))
+    decomposition_indices = _adjust_index(decomposition_indices)
     mappings: list[Sequence[Santa]] = []
     lower_boundary = 0
-    for upper_boundary in decomposition:
+    for upper_boundary in decomposition_indices:
         prime_mapping = santas[lower_boundary:upper_boundary]
         mappings.append(prime_mapping)
         lower_boundary = upper_boundary

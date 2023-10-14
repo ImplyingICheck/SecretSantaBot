@@ -12,6 +12,9 @@ from discord.ext import commands
 
 from secret_santa_bot.bot import chains_of_primes
 
+_logger = logging.getLogger(__name__)
+_logger.handlers = logging.getLogger('discord').handlers
+
 
 # TODO: Find minimum set of permissions required
 class Bot(commands.Bot):
@@ -46,12 +49,10 @@ class Santa:
 @bot.event
 async def on_ready() -> None:
     """Required permissions: None"""
-    await bot.tree.sync(guild=discord.Object(id=os.environ['GUILD_ID']))
     print('Bot is ready to bot it up')
 
 
-async def _message_santa(santa: Santa) -> bool:
-    successful = False
+async def _message_santa(santa: Santa, role_name: str) -> None:
     try:
         await santa.member.send(
             (
@@ -65,17 +66,23 @@ async def _message_santa(santa: Santa) -> bool:
                 f'button -> Archived -> Private'
             )
         )
-        successful = True
-    except discord.errors.Forbidden:
-        logging.error(
+    except discord.errors.Forbidden as e:
+        _logger.error(
             'Unable to message "%s". The user may have messaging from '
             'non-friend server members disabled.',
-            {santa.member.name},
+            santa.member.name,
         )
-    except AttributeError:
-        # Bot attempts to message itself
-        successful = True
-    return successful
+        raise e from None
+    except (discord.HTTPException, TypeError) as e:
+        _logger.exception('Unknown error occurred:', exc_info=e)
+        raise e
+    except AttributeError as e:
+        _logger.critical(
+            'SecretSantaBot is in the role @%s. The generated secret santa '
+            'groups are invalid as SecretSantaBot does not own capital D:',
+            role_name,
+        )
+        raise e from None
 
 
 def _create_santas(role: discord.Role) -> list[Santa]:
@@ -87,30 +94,48 @@ def _create_santas(role: discord.Role) -> list[Santa]:
 async def _message_santas(role: discord.Role):
     santas = _create_santas(role)
     santas = chains_of_primes.assign_santas(santas)
-    messages = [_message_santa(santa) for santa in santas]
+    messages = [_message_santa(santa, role.name) for santa in santas]
     return await asyncio.gather(*messages)
 
 
 @bot.tree.command(guild=discord.Object(id=os.environ['GUILD_ID']))
 async def secret_santa(interaction: discord.Interaction, role: discord.Role):
-    """Required permissions:"""
-    if interaction.guild:
-        guild_owner = interaction.guild.owner_id
-    else:
-        guild_owner = object()
+    """Required permission: Server Members Intent
+
+    Args:
+        interaction:
+        role: A role defined within a discord guild. This should not include
+            the bot, otherwise the bot will be included in the gift givers.
+
+    Returns:
+
+    """
+    guild_owner = interaction.guild.owner_id if interaction.guild else object()
     command_invoker = interaction.user.id
     if guild_owner == command_invoker:
-        message_successful = await _message_santas(role)
-        if not all(message_successful):
-            response_message = 'Santas successfully messaged.'
+        try:
+            await _message_santas(role)
+        except ValueError:
+            response_message = (
+                f'Error: Only one participant found in role @{role.name}.'
+            )
+        except discord.Forbidden:
+            response_message = 'Error during messaging. Check log for details.'
+        except (discord.HTTPException, TypeError):
+            response_message = 'Unknown error occurred. Check log for details.'
+        except AttributeError:
+            response_message = (
+                f'CRITICAL ERROR: SecretSantaBot cannot give gifts. Remove '
+                f'SecretSantaBot from @{role.name} and generate again.'
+            )
         else:
-            response_message = 'Error during operation. Check log for details.'
+            response_message = 'Santas successfully messaged.'
         await interaction.response.send_message(
             response_message, ephemeral=True
         )
     else:
         await interaction.response.send_message(
-            'Only the owner can roll for secret santa', ephemeral=True
+            'Only the owner may roll for secret santa', ephemeral=True
         )
 
 
