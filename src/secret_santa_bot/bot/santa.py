@@ -197,4 +197,6 @@ async def secret_santa(interaction: discord.Interaction, role: discord.Role):
 
 def main(discord_authentication_token: str, /) -> None:
     """Runs the SecretSantaBot. This function is locking."""
-    bot.run(discord_authentication_token)
+    bot = SecretSantaBot(token=discord_authentication_token)
+    del discord_authentication_token
+    bot.run()
