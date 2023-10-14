@@ -10,11 +10,10 @@ def main():
         url=os.environ['VAULT_PATH'], token=os.environ['VAULT_TOKEN']
     )
     os.environ['GUILD_ID'] = vault.read_secret_token(username='guild_id')
-    discord_authentication_token: str = vault.read_secret_token()
     # In-line import as discord.py uses function decorators to assign commands
     import secret_santa_bot.bot.santa  # pylint: disable=import-outside-toplevel
 
-    secret_santa_bot.bot.santa.main(discord_authentication_token)
+    secret_santa_bot.bot.santa.main(vault.read_secret_token())
 
 
 if __name__ == '__main__':
