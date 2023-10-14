@@ -9,13 +9,7 @@ import typing
 import hikari
 
 from secret_santa_bot.bot import chains_of_primes
-
-if typing.TYPE_CHECKING:
-    import concurrent.futures
-    import os
-    from hikari.internal import data_binding
-    from hikari import intents as intents_
-    from hikari.impl import config as config_impl
+from secret_santa_bot.bot import command_registration_mixin
 
 
 _logger = logging.getLogger(__name__)

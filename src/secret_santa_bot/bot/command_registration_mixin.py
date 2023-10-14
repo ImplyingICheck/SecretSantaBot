@@ -1,15 +1,17 @@
 from __future__ import annotations
 
 import concurrent.futures
-import os
-import typing
+from typing import Any, TYPE_CHECKING
 
 import hikari
-from hikari import intents as intents_
-from hikari.impl import config as config_impl
-from hikari.internal import data_binding
 
 from secret_santa_bot.bot.santa import get_super_dir
+
+if TYPE_CHECKING:
+    import os
+    from hikari import intents as intents_
+    from hikari.impl import config as config_impl
+    from hikari.internal import data_binding
 
 
 class CommandRegistrationMixin(hikari.GatewayBot):
@@ -22,23 +24,21 @@ class CommandRegistrationMixin(hikari.GatewayBot):
         token: str,
         *,
         allow_color: bool = True,
-        banner: typing.Optional[str] = 'hikari',
+        banner: str | None = 'hikari',
         suppress_optimization_warning: bool = False,
-        executor: typing.Optional[concurrent.futures.Executor] = None,
+        executor: concurrent.futures.Executor | None = None,
         force_color: bool = False,
-        cache_settings: typing.Optional[config_impl.CacheSettings] = None,
-        http_settings: typing.Optional[config_impl.HTTPSettings] = None,
+        cache_settings: config_impl.CacheSettings | None = None,
+        http_settings: config_impl.HTTPSettings | None = None,
         dumps: data_binding.JSONEncoder = data_binding.default_json_dumps,
         loads: data_binding.JSONDecoder = data_binding.default_json_loads,
         intents: intents_.Intents = intents_.Intents.ALL_UNPRIVILEGED,
         auto_chunk_members: bool = True,
-        logs: typing.Union[
-            None, str, int, typing.Dict[str, typing.Any], os.PathLike[str]
-        ] = 'INFO',
+        logs: None | str | int | dict[str, Any] | os.PathLike[str] = 'INFO',
         max_rate_limit: float = 300.0,
         max_retries: int = 3,
-        proxy_settings: typing.Optional[config_impl.ProxySettings] = None,
-        rest_url: typing.Optional[str] = None,
+        proxy_settings: config_impl.ProxySettings | None = None,
+        rest_url: str | None = None,
     ):
         super().__init__(
             token,
