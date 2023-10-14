@@ -70,7 +70,9 @@ class CommandRegistrationMixin(hikari.GatewayBot):
     def register_commands(self):
         super_dir = get_super_dir(self)
         local_methods = [
-            method for method in dir(self) if method not in super_dir
+            method
+            for method in dir(self)
+            if method not in super_dir and callable(method)
         ]
         for method in local_methods:
             if not method.startswith('_'):
