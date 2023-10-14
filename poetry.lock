@@ -357,6 +357,23 @@ files = [
 ]
 
 [[package]]
+name = "colorlog"
+version = "6.7.0"
+description = "Add colours to the output of Python's logging module."
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "colorlog-6.7.0-py2.py3-none-any.whl", hash = "sha256:0d33ca236784a1ba3ff9c532d4964126d8a2c44f1f0cb1d2b0728196f512f662"},
+    {file = "colorlog-6.7.0.tar.gz", hash = "sha256:bd94bd21c1e13fac7bd3153f4bc3a7dc0eb0974b8bc2fdf1a989e474f6e582e5"},
+]
+
+[package.dependencies]
+colorama = {version = "*", markers = "sys_platform == \"win32\""}
+
+[package.extras]
+development = ["black", "flake8", "mypy", "pytest", "types-colorama"]
+
+[[package]]
 name = "dill"
 version = "0.3.7"
 description = "serialize all of Python"
@@ -369,26 +386,6 @@ files = [
 
 [package.extras]
 graph = ["objgraph (>=1.7.2)"]
-
-[[package]]
-name = "discord-py"
-version = "2.3.2"
-description = "A Python wrapper for the Discord API"
-optional = false
-python-versions = ">=3.8.0"
-files = [
-    {file = "discord.py-2.3.2-py3-none-any.whl", hash = "sha256:9da4679fc3cb10c64b388284700dc998663e0e57328283bbfcfc2525ec5960a6"},
-    {file = "discord.py-2.3.2.tar.gz", hash = "sha256:4560f70f2eddba7e83370ecebd237ac09fbb4980dc66507482b0c0e5b8f76b9c"},
-]
-
-[package.dependencies]
-aiohttp = ">=3.7.4,<4"
-
-[package.extras]
-docs = ["sphinx (==4.4.0)", "sphinxcontrib-trio (==1.1.2)", "sphinxcontrib-websupport", "typing-extensions (>=4.3,<5)"]
-speed = ["Brotli", "aiodns (>=1.1)", "cchardet (==2.1.7)", "orjson (>=3.5.4)"]
-test = ["coverage[toml]", "pytest", "pytest-asyncio", "pytest-cov", "pytest-mock", "typing-extensions (>=4.3,<5)"]
-voice = ["PyNaCl (>=1.3.0,<1.6)"]
 
 [[package]]
 name = "distlib"
@@ -486,6 +483,27 @@ files = [
     {file = "frozenlist-1.4.0-cp39-cp39-win_amd64.whl", hash = "sha256:6221d84d463fb110bdd7619b69cb43878a11d51cbb9394ae3105d082d5199167"},
     {file = "frozenlist-1.4.0.tar.gz", hash = "sha256:09163bdf0b2907454042edb19f887c6d33806adc71fbd54afc14908bfdc22251"},
 ]
+
+[[package]]
+name = "hikari"
+version = "2.0.0.dev121"
+description = "A sane Discord API for Python 3 built on asyncio and good intentions"
+optional = false
+python-versions = ">=3.8.0,<3.12"
+files = [
+    {file = "hikari-2.0.0.dev121-py3-none-any.whl", hash = "sha256:54b62e74c19a7b3f91ed75f954fabad67eb262b6cd6f763ba0ec4b3d4f0f0a62"},
+    {file = "hikari-2.0.0.dev121.tar.gz", hash = "sha256:0c6727b7315a2a61dc419c943d2fa6b2761f556edc9e697351d4d3bdd950df8b"},
+]
+
+[package.dependencies]
+aiohttp = ">=3.8,<4.0"
+attrs = ">=23.1,<24.0"
+colorlog = ">=6.7,<7.0"
+multidict = ">=6.0,<7.0"
+
+[package.extras]
+server = ["pynacl (>=1.5,<2.0)"]
+speedups = ["aiohttp[speedups] (>=3.8,<4.0)", "ciso8601 (>=2.3,<3.0)", "orjson (>=3.9,<4.0)"]
 
 [[package]]
 name = "hvac"
@@ -1210,5 +1228,5 @@ multidict = ">=4.0"
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.11"
-content-hash = "218ab9165632910517810c299f6d87c8c9a3e6de31d998d2c4dd7cb791be0413"
+python-versions = "^3.11,<3.12"
+content-hash = "c427534b07de47bb60702a2813b9a9a169cd010fcbc3e0449eafd49e2a768b78"
