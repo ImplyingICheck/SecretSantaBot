@@ -29,12 +29,10 @@ def get_super_dir(object_: object):
     return super_attributes
 
 
-class Bot(hikari.GatewayBot):
-    """A helper class designed to register all bot commands of the lowest
-    subclass. The registration invokes self.listen() on each public method
-    (i.e., any method not prepended with _ or __).
-
-    This class should not be instantiated on its own."""
+class CommandRegistrationMixin(hikari.GatewayBot):
+    """A Mixin designed to register all bot commands of the lowest subclass.
+    The registration invokes self.listen() on each public method (i.e., any
+    method not prepended with _ or __)."""
 
     def __init__(
         self,
@@ -90,7 +88,7 @@ class Bot(hikari.GatewayBot):
                 self.listen()(getattr(self, method))
 
 
-class SecretSantaBot(Bot):
+class SecretSantaBot(CommandRegistrationMixin):
 
     async def ping(self, event: hikari.GuildMessageCreateEvent) -> None:
         """If a non-bot user @ mentions your bot, respond with 'Pong!'."""
