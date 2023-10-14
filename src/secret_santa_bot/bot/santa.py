@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import typing
 
 import hikari
 
@@ -14,13 +13,6 @@ from secret_santa_bot.bot import command_registration_mixin
 
 _logger = logging.getLogger(__name__)
 _logger.handlers = logging.getLogger('hikari').handlers
-
-
-def get_super_dir(object_: object):
-    super_attributes = set()
-    for base_class in object_.__class__.__bases__:
-        super_attributes.update(dir(base_class))
-    return super_attributes
 
 
 class SecretSantaBot(command_registration_mixin.CommandRegistrationMixin):

@@ -5,13 +5,19 @@ from typing import Any, TYPE_CHECKING
 
 import hikari
 
-from secret_santa_bot.bot.santa import get_super_dir
 
 if TYPE_CHECKING:
     import os
     from hikari import intents as intents_
     from hikari.impl import config as config_impl
     from hikari.internal import data_binding
+
+
+def get_super_dir(object_: object):
+    super_attributes = set()
+    for base_class in object_.__class__.__bases__:
+        super_attributes.update(dir(base_class))
+    return super_attributes
 
 
 class CommandRegistrationMixin(hikari.GatewayBot):
