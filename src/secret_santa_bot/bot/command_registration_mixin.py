@@ -4,13 +4,13 @@ import concurrent.futures
 from typing import Any, TYPE_CHECKING
 
 import hikari
+from hikari.internal import data_binding
+from hikari import intents as intents_
 
 
 if TYPE_CHECKING:
     import os
-    from hikari import intents as intents_
     from hikari.impl import config as config_impl
-    from hikari.internal import data_binding
 
 
 def get_super_dir(object_: object):
