@@ -4,16 +4,14 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import os
-from typing import Any
 
-import discord
-from discord.ext import commands
+import hikari
 
 from secret_santa_bot.bot import chains_of_primes
 
 _logger = logging.getLogger(__name__)
-_logger.handlers = logging.getLogger('discord').handlers
+_logger.handlers = logging.getLogger('hikari').handlers
+
 
 
 # TODO: Find minimum set of permissions required
