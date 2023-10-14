@@ -49,7 +49,6 @@ class Santa:
 @bot.event
 async def on_ready() -> None:
     """Required permissions: None"""
-    await bot.tree.sync(guild=discord.Object(id=os.environ['GUILD_ID']))
     print('Bot is ready to bot it up')
 
 
@@ -101,7 +100,7 @@ async def _message_santas(role: discord.Role):
 
 @bot.tree.command(guild=discord.Object(id=os.environ['GUILD_ID']))
 async def secret_santa(interaction: discord.Interaction, role: discord.Role):
-    """
+    """Required permission: Server Members Intent
 
     Args:
         interaction:
