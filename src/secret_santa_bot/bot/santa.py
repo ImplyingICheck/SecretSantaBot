@@ -90,7 +90,15 @@ class Bot(hikari.GatewayBot):
                 self.listen()(getattr(self, method))
 
 
-bot = Bot()
+class SecretSantaBot(Bot):
+
+    async def ping(self, event: hikari.GuildMessageCreateEvent) -> None:
+        """If a non-bot user @ mentions your bot, respond with 'Pong!'."""
+        if not event.is_human:
+            return
+        me = self.get_me()
+        if me.id in event.message.user_mentions_ids:
+            await event.message.respond('Pong!')
 
 
 class Santa:
