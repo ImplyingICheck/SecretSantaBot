@@ -109,12 +109,6 @@ class Santa:
         self.target: discord.Member | None = None
 
 
-@bot.event
-async def on_ready() -> None:
-    """Required permissions: None"""
-    print('Bot is ready to bot it up')
-
-
 async def _message_santa(santa: Santa, role_name: str) -> None:
     try:
         await santa.member.send(
@@ -161,7 +155,6 @@ async def _message_santas(role: discord.Role):
     return await asyncio.gather(*messages)
 
 
-@bot.tree.command(guild=discord.Object(id=os.environ['GUILD_ID']))
 async def secret_santa(interaction: discord.Interaction, role: discord.Role):
     """Required permission: Server Members Intent
 
