@@ -542,6 +542,23 @@ server = ["pynacl (>=1.5,<2.0)"]
 speedups = ["aiohttp[speedups] (>=3.10,<4.0)", "ciso8601 (>=2.3,<3.0)", "orjson (>=3.10,<4.0)"]
 
 [[package]]
+name = "hikari-lightbulb"
+version = "2.3.5.post1"
+description = "A simple to use command handler for Hikari"
+optional = false
+python-versions = "<3.13,>=3.8.0"
+files = [
+    {file = "hikari_lightbulb-2.3.5.post1-py3-none-any.whl", hash = "sha256:9d4e6d180e5d38c97c0d89fba2bae5859b5c79d2a848d321fb8866e3b028816f"},
+    {file = "hikari_lightbulb-2.3.5.post1.tar.gz", hash = "sha256:89ece6d07a87853c015c8626783ebdb90f9a903c8c03024d71208021adbd9b27"},
+]
+
+[package.dependencies]
+hikari = ">=2.1.0,<2.2.0"
+
+[package.extras]
+crontrigger = ["croniter (>=2.0.1,<2.1.0)", "types-croniter (>=2.0.0,<2.1.0)"]
+
+[[package]]
 name = "hvac"
 version = "1.2.1"
 description = "HashiCorp Vault API client"
@@ -1418,5 +1435,5 @@ propcache = ">=0.2.0"
 
 [metadata]
 lock-version = "2.0"
-python-versions = "^3.11,<3.14"
-content-hash = "d4ddebc8ae276ae8a695fb2820fd937919867c10cbe0506c43bc3c1fcdd34d41"
+python-versions = "^3.11,<3.13"
+content-hash = "fd9f0d22a5a9f7c63d241a503cac6979cb88bef0a9a1202f895ae3b965919989"
