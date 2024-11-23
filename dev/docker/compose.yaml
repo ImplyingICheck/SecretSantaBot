@@ -5,28 +5,34 @@ services:
       dockerfile: ./dev/docker/Dockerfile
     volumes:
       - ../../src:/app
+      - runtime_secrets:/runtime_secrets
+      - ./workflow_bot.sh:/build/workflow_bot.sh
+    depends_on:
+      - vault
     environment:
       VAULT_PATH: 'http://vault:8200'
-      VAULT_TOKEN: 'my_root'
     networks:
       - santas_workshop
-  secrets:
+  vault:
     image: hashicorp/vault
     container_name: vault
     volumes:
-      - ./secrets:/secrets
+      - runtime_secrets:/runtime_secrets
+      - ./config.hcl:/vault_config/config.hcl
+      - ./workflow_vault.sh:/workflow_vault.sh
     environment:
-      VAULT_DEV_ROOT_TOKEN_ID: 'my_root'
+      VAULT_CONFIG: '/vault_config/config.hcl'
+      VAULT_ADDR: 'http://127.0.0.1:8200'
     cap_add:
       - IPC_LOCK
-    command: ["server", "--dev"]
+    command: ["ash", "./workflow_vault.sh"]
     ports:
       - "127.0.0.1:8200:8200"
     networks:
       - santas_workshop
 
+volumes:
+  runtime_secrets:
+
 networks:
   santas_workshop:
-
-volumes:
-  secrets:
