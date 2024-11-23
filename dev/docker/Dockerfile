@@ -40,6 +40,5 @@ COPY src .
 
 ENV PYTHONPATH "${PYTHONPATH}:src"
 
-# Run the application.
-CMD python secret_santa_bot/main.py
-
+# Read in VAULT_TOKEN set by hashicorp vault
+CMD sh /build/workflow_bot.sh
