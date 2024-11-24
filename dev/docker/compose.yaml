@@ -11,6 +11,7 @@ services:
       - vault
     environment:
       VAULT_PATH: 'http://vault:8200'
+      ROOT_TOKEN_FILE: '/runtime_secrets/root_token.txt'
     networks:
       - santas_workshop
   vault:
@@ -23,6 +24,7 @@ services:
     environment:
       VAULT_CONFIG: '/vault_config/config.hcl'
       VAULT_ADDR: 'http://127.0.0.1:8200'
+      ROOT_TOKEN_FILE: '/runtime_secrets/root_token.txt'
     cap_add:
       - IPC_LOCK
     command: ["ash", "./workflow_vault.sh"]
