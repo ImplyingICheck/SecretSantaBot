@@ -14,7 +14,7 @@ done
 
 # Get root token
 rootToken="$(awk -F': ' '/Initial Root Token:/ {print $2}' generated_keys.txt)"
-[ ! -e /secrets/root_token.txt ] && echo "$rootToken" > /runtime_secrets/root_token.txt
+[ ! -e /secrets/root_token.txt ] && echo "$rootToken" > "$ROOT_TOKEN_FILE"
 
 # Enable kv secrets
 vault login "$rootToken"
